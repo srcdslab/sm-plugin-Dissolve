@@ -5,10 +5,10 @@
 
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.0"
+#define PLUGIN_VERSION "2.1"
 
-Handle cvDelay = INVALID_HANDLE;
-Handle cvType = INVALID_HANDLE;
+ConVar cvDelay = null;
+ConVar cvType = null;
 
 public Plugin myinfo =
 {
@@ -35,15 +35,15 @@ public void OnEventShutdown()
   UnhookEvent("player_death", PlayerDeath);
 }
 
-public Action PlayerDeath(Handle event, const char[] name, bool dontBroadcast)
+public Action PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
-  int client = GetClientOfUserId(GetEventInt(event, "userid"));
+  int client = GetClientOfUserId(event.GetInt("userid"));
 
-  float delay = GetConVarFloat(cvDelay);
+  float delay = cvDelay.FloatValue;
   if (delay > 0.0)
     CreateTimer(delay, Dissolve, client); 
   else
-    Dissolve(INVALID_HANDLE, client);
+    Dissolve(null, client);
 
   return Plugin_Continue;
 }
@@ -60,7 +60,7 @@ public Action Dissolve(Handle timer, any client)
   char dname[32];
   char dtype[32];
   Format(dname, sizeof(dname), "dis_%d", client);
-  Format(dtype, sizeof(dtype), "%d", GetConVarInt(cvType));
+  Format(dtype, sizeof(dtype), "%d", cvType.IntValue);
 
   int ent = CreateEntityByName("env_entity_dissolver");
   if (ent > 0)
