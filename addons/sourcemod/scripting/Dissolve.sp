@@ -37,30 +37,24 @@ public void OnEventShutdown()
 
 public Action PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
-  int userid = event.GetInt("userid");
+  int client = GetClientOfUserId(event.GetInt("userid"));
 
   float delay = cvDelay.FloatValue;
   if (delay > 0.0)
-    CreateTimer(delay, Timer_Dissolve, userid, TIMER_FLAG_NO_MAPCHANGE);
+    CreateTimer(delay, Dissolve, client); 
   else
-    Dissolve(GetClientOfUserId(userid));
+    Dissolve(null, client);
 
   return Plugin_Continue;
 }
 
-public Action Timer_Dissolve(Handle timer, any userid)
+public Action Dissolve(Handle timer, any client)
 {
-  Dissolve(GetClientOfUserId(userid));
-  return Plugin_Stop;
-}
-
-void Dissolve(int client)
-{
-  if (!client || !IsClientInGame(client))
+  if (!IsValidEntity(client))
     return;
 
   int ragdoll = GetEntPropEnt(client, Prop_Send, "m_hRagdoll");
-  if (ragdoll <= 0)
+  if (ragdoll < 0)
     return;
 
   char dname[32];
