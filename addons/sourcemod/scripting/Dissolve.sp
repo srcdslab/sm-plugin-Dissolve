@@ -5,7 +5,7 @@
 
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.1.1"
+#define PLUGIN_VERSION "2.1.2"
 
 ConVar cvDelay = null;
 ConVar cvType = null;
@@ -37,24 +37,30 @@ public void OnEventShutdown()
 
 public Action PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 {
-  int client = GetClientOfUserId(event.GetInt("userid"));
+  int userid = event.GetInt("userid");
 
   float delay = cvDelay.FloatValue;
   if (delay > 0.0)
-    CreateTimer(delay, Dissolve, client); 
+    CreateTimer(delay, Timer_Dissolve, userid, TIMER_FLAG_NO_MAPCHANGE);
   else
-    Dissolve(null, client);
+    Dissolve(GetClientOfUserId(userid));
 
   return Plugin_Continue;
 }
 
-public Action Dissolve(Handle timer, any client)
+public Action Timer_Dissolve(Handle timer, any userid)
 {
-  if (!IsValidEntity(client))
+  Dissolve(GetClientOfUserId(userid));
+  return Plugin_Stop;
+}
+
+void Dissolve(int client)
+{
+  if (!client || !IsClientInGame(client))
     return;
 
   int ragdoll = GetEntPropEnt(client, Prop_Send, "m_hRagdoll");
-  if (ragdoll < 0)
+  if (ragdoll <= 0)
     return;
 
   char dname[32];
