@@ -5,7 +5,7 @@
 
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.1.2"
+#define PLUGIN_VERSION "2.1.3"
 
 ConVar cvDelay = null;
 ConVar cvType = null;
@@ -41,16 +41,21 @@ public Action PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 
   float delay = cvDelay.FloatValue;
   if (delay > 0.0)
-    CreateTimer(delay, Dissolve, userid, TIMER_FLAG_NO_MAPCHANGE);
+    CreateTimer(delay, Timer_Dissolve, userid, TIMER_FLAG_NO_MAPCHANGE);
   else
-    Dissolve(null, userid);
+    Dissolve(GetClientOfUserId(userid));
 
   return Plugin_Continue;
 }
 
-public Action Dissolve(Handle timer, any userid)
+public Action Timer_Dissolve(Handle timer, any userid)
 {
-  int client = GetClientOfUserId(userid);
+  Dissolve(GetClientOfUserId(userid));
+  return Plugin_Stop;
+}
+
+void Dissolve(int client)
+{
   if (!client || !IsClientInGame(client))
     return;
 
