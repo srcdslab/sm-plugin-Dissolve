@@ -41,21 +41,16 @@ public Action PlayerDeath(Event event, const char[] name, bool dontBroadcast)
 
   float delay = cvDelay.FloatValue;
   if (delay > 0.0)
-    CreateTimer(delay, Timer_Dissolve, userid, TIMER_FLAG_NO_MAPCHANGE);
+    CreateTimer(delay, Dissolve, userid, TIMER_FLAG_NO_MAPCHANGE);
   else
-    Dissolve(GetClientOfUserId(userid));
+    Dissolve(null, userid);
 
   return Plugin_Continue;
 }
 
-public Action Timer_Dissolve(Handle timer, any userid)
+public Action Dissolve(Handle timer, any userid)
 {
-  Dissolve(GetClientOfUserId(userid));
-  return Plugin_Stop;
-}
-
-void Dissolve(int client)
-{
+  int client = GetClientOfUserId(userid);
   if (!client || !IsClientInGame(client))
     return;
 
