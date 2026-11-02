@@ -5,7 +5,7 @@
 
 #pragma newdecls required
 
-#define PLUGIN_VERSION "2.1"
+#define PLUGIN_VERSION "2.1.1"
 
 ConVar cvDelay = null;
 ConVar cvType = null;
